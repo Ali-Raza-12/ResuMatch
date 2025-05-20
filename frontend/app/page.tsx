@@ -45,23 +45,69 @@ const dummyScores = [
   },
 ];
 
+type Score = {
+  fileName: string;
+  score: number;
+  skills: string[];
+  experience: string;
+  education: string;
+  location: string;
+  lastPosition: string;
+};
+
+
 export default function Home() {
   const [inputMethod, setInputMethod] = useState<'text' | 'file'>('text');
   const [jobDescription, setJobDescription] = useState('');
   const [jobDescriptionFile, setJobDescriptionFile] = useState<File | null>(null);
   const [resumes, setResumes] = useState<FileList | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [scores, setScores] = useState<typeof dummyScores>(dummyScores); // Initialize with dummy data
+  const [scores, setScores] = useState<Score[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate API call with dummy data
-    setTimeout(() => {
-      setScores(dummyScores);
+    const formData = new FormData();
+    if (inputMethod === 'text') {
+      formData.append('job_desc', jobDescription);
+    } else if (jobDescriptionFile) {
+      formData.append('job_desc_file', jobDescriptionFile);
+    }
+
+    if (resumes) {
+      Array.from(resumes).forEach((file) => {
+        formData.append('resumes', file);
+      });
+    }
+
+    // for (const [key, value] of formData.entries()) {
+    //   console.log(`${key}:`, value);
+    // }
+
+    try {
+      const response = await fetch('http://localhost:5000/api/screen', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        console.error('Server error:', response.status, text);
+        alert(`Error ${response.status}: ${text}`);
+        return;
+      }
+
+
+      const data = await response.json();
+      console.log('Response data:', data);
+      setScores(data.scores);
+
+    } catch (error: any) {
+      alert(`Error processing resumes. ${error.message || 'Unknown error'} `);
+    } finally {
       setIsLoading(false);
-    }, 2000);
+    }
   };
 
   return (
