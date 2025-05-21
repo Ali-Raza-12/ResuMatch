@@ -45,7 +45,7 @@ export default function ScoreTable({ scores }: ScoreTableProps) {
                 Experience & Education
               </th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50">
-                Location & Position
+                Position
               </th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50 rounded-tr-lg">
                 Rating
@@ -53,9 +53,9 @@ export default function ScoreTable({ scores }: ScoreTableProps) {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 bg-white">
-            {scores.map((score, index) => (
+            {scores?.map((score, index) => (
               <tr key={index} className="hover:bg-gray-50 transition-colors">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                <td className="px-2 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {score.fileName}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -85,7 +85,7 @@ export default function ScoreTable({ scores }: ScoreTableProps) {
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-500">
                   <div className="font-medium text-gray-900">{score.location}</div>
-                  <div className="text-gray-500">{score.lastPosition}</div>
+                  {/* <div className="text-gray-500">{score.lastPosition}</div> */}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`px-3 py-1 text-xs font-semibold rounded-full border ${getScoreColor(score.score)}`}>
