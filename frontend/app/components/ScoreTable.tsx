@@ -84,7 +84,7 @@ export default function ScoreTable({ scores }: ScoreTableProps) {
                   <div className="text-gray-500">{score.education}</div>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-500">
-                  <div className="font-medium text-gray-900">{score.location}</div>
+                  <div className="font-medium text-gray-900">{score.lastPosition}</div>
                   {/* <div className="text-gray-500">{score.lastPosition}</div> */}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">

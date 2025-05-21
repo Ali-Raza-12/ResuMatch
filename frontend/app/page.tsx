@@ -1,49 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import FileUpload from './components/FileUpload';
-import LoadingSpinner from './components/LoadingSpinner';
 import ScoreTable from './components/ScoreTable';
 
-// Dummy data for demonstration
-const dummyScores = [
-  {
-    fileName: 'john_doe_resume.pdf',
-    score: 92,
-    skills: ['React', 'TypeScript', 'Node.js'],
-    experience: '5 years',
-    education: 'Masters in Computer Science',
-    location: 'New York, USA',
-    lastPosition: 'Senior Frontend Developer'
-  },
-  {
-    fileName: 'jane_smith_cv.pdf',
-    score: 78,
-    skills: ['JavaScript', 'Python', 'AWS'],
-    experience: '3 years',
-    education: 'Bachelor in Software Engineering',
-    location: 'San Francisco, USA',
-    lastPosition: 'Full Stack Developer'
-  },
-  {
-    fileName: 'mike_johnson_resume.docx',
-    score: 65,
-    skills: ['Java', 'Spring', 'Docker'],
-    experience: '4 years',
-    education: 'Bachelor in Computer Engineering',
-    location: 'London, UK',
-    lastPosition: 'Backend Developer'
-  },
-  {
-    fileName: 'sarah_williams_cv.pdf',
-    score: 88,
-    skills: ['Angular', 'MongoDB', 'Express'],
-    experience: '6 years',
-    education: 'PhD in Data Science',
-    location: 'Toronto, Canada',
-    lastPosition: 'Lead Developer'
-  },
-];
 
 type Score = {
   fileName: string;
@@ -57,9 +16,7 @@ type Score = {
 
 
 export default function Home() {
-  const [inputMethod, setInputMethod] = useState<'text' | 'file'>('text');
   const [jobDescription, setJobDescription] = useState('');
-  const [jobDescriptionFile, setJobDescriptionFile] = useState<File | null>(null);
   const [resumes, setResumes] = useState<FileList | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [scores, setScores] = useState<Score[]>([]);
@@ -69,11 +26,7 @@ export default function Home() {
     setIsLoading(true);
 
     const formData = new FormData();
-    if (inputMethod === 'text') {
-      formData.append('job_desc', jobDescription);
-    } else if (jobDescriptionFile) {
-      formData.append('job_desc_file', jobDescriptionFile);
-    }
+    formData.append('job_desc', jobDescription);
 
     if (resumes) {
       Array.from(resumes).forEach((file) => {
@@ -81,9 +34,6 @@ export default function Home() {
       });
     }
 
-    // for (const [key, value] of formData.entries()) {
-    //   console.log(`${key}:`, value);
-    // }
 
     try {
       const response = await fetch('http://localhost:5000/api/screen', {
@@ -138,7 +88,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="max-w-full min-h-[72vh] mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
             AI-Powered Resume Screening
@@ -154,79 +104,18 @@ export default function Home() {
             <div className="p-8">
               <div className="mb-8">
                 <h2 className="text-lg font-medium text-gray-900 mb-4">Job Description</h2>
-                <div className="flex rounded-lg shadow-sm mb-6">
-                  <button
-                    type="button"
-                    onClick={() => setInputMethod('text')}
-                    className={`flex-1 py-3 px-4 rounded-l-lg text-sm font-medium ${inputMethod === 'text'
-                      ? 'bg-indigo-600 text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-50'
-                      }`}
-                  >
-                    Enter Text
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setInputMethod('file')}
-                    className={`flex-1 py-3 px-4 rounded-r-lg text-sm font-medium ${inputMethod === 'file'
-                      ? 'bg-indigo-600 text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-50'
-                      }`}
-                  >
-                    Upload File
-                  </button>
+                <div>
+                  <label htmlFor="job-description" className="sr-only">Job Description</label>
+                  <textarea
+                    id="job-description"
+                    rows={8}
+                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-4 border"
+                    placeholder="Paste job description here..."
+                    value={jobDescription}
+                    onChange={(e) => setJobDescription(e.target.value)}
+                    required
+                  />
                 </div>
-
-                {inputMethod === 'text' ? (
-                  <div>
-                    <label htmlFor="job-description" className="sr-only">Job Description</label>
-                    <textarea
-                      id="job-description"
-                      rows={8}
-                      className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-4 border"
-                      placeholder="Paste job description here..."
-                      value={jobDescription}
-                      onChange={(e) => setJobDescription(e.target.value)}
-                    />
-                  </div>
-                ) : (
-                  <div className="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                    <div className="space-y-1 text-center">
-                      <svg
-                        className="mx-auto h-12 w-12 text-gray-400"
-                        stroke="currentColor"
-                        fill="none"
-                        viewBox="0 0 48 48"
-                        aria-hidden="true"
-                      >
-                        <path
-                          d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                      <div className="flex text-sm text-gray-600">
-                        <label
-                          htmlFor="job-description-file"
-                          className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none"
-                        >
-                          <span>Upload a file</span>
-                          <input
-                            id="job-description-file"
-                            name="job-description-file"
-                            type="file"
-                            className="sr-only"
-                            onChange={(e) => setJobDescriptionFile(e.target.files?.[0] || null)}
-                            accept=".pdf,.docx,.txt"
-                          />
-                        </label>
-                        <p className="pl-1">or drag and drop</p>
-                      </div>
-                      <p className="text-xs text-gray-500">PDF, DOCX, or TXT up to 10MB</p>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
 
@@ -306,7 +195,7 @@ export default function Home() {
               <button
                 type="submit"
                 onClick={handleSubmit}
-                disabled={(!jobDescription && !jobDescriptionFile) || !resumes || isLoading}
+                disabled={!jobDescription || !resumes || isLoading}
                 className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
@@ -339,7 +228,7 @@ export default function Home() {
 
         {scores.length > 0 && (
           <div className="mt-12">
-              <ScoreTable scores={scores} />
+            <ScoreTable scores={scores} />
           </div>
         )}
       </main>
